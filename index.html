@@ -792,7 +792,7 @@ Raw note: "${rawNotes}"`;
             const bnReview = item.BnReview || item.Review;
             const bnNote = item.BnNote || item.Note;
 
-            const msg = `আসসালামু আলাইকুম,\n📚 *Online Quran | Student Portal*\n👤 *Student:* ${item['Student Name']}\n📅 *Date:* ${item.Date} (${item['Class No.']})\n⏰ *Time:* ${item.Time}\n📖 *Books:* ${item['Book Name']}\n\n✅ *Previous Lesson Review (আগের পড়া):*\n${bnReview}\n\n📘 *Today's Topics (আজকের নতুন পড়া):*\n${bnTopics}\n\n🏠 *Homework & Note (বাড়ির কাজ):*\n${bnNote}\n\nজাযাকাল্লাহু খাইরান।`;
+            const msg = `আসসালামু আলাইকুম,\n📚 *Al-Hidayah Online Quran & Arabic Studies*\n👤 *Student:* ${item['Student Name']}\n📅 *Date:* ${item.Date} (${item['Class No.']})\n⏰ *Time:* ${item.Time}\n📖 *Books:* ${item['Book Name']}\n\n✅ *Previous Lesson Review (আগের পড়া):*\n${bnReview}\n\n📘 *Today's Topics (আজকের নতুন পড়া):*\n${bnTopics}\n\n🏠 *Homework & Note (বাড়ির কাজ):*\n${bnNote}\n\nজাযাকাল্লাহু খাইরান।`;
 
             copyToClipboard(msg, `Copied ${item['Class No.']} report for WhatsApp!`);
         }
