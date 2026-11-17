@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nazif Al Kabir — Online Quran & Arabic Studies Portal</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Plus Jakarta Sans & Hind Siliguri -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', '"Hind Siliguri"', 'sans-serif'],
+                        bengali: ['"Hind Siliguri"', '"Plus Jakarta Sans"', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', 'Hind Siliguri', sans-serif;
+            background-color: #f4f7f6;
+        }
+        .bangla {
+            font-family: 'Hind Siliguri', 'Plus Jakarta Sans', sans-serif;
+        }
+        @media print {
+            .no-print { display: none !important; }
+            body { background: #ffffff !important; }
+            .print-shadow-none { box-shadow: none !important; border: 1px solid #e2e8f0 !important; }
+        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none no-print"></div>
+
+    <!-- Top Academy Navigation Bar -->
+    <header class="bg-gradient-to-r from-emerald-950 via-emerald-900 to-teal-900 text-white shadow-lg sticky top-0 z-40 border-b border-emerald-800/60">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <!-- Academy & Student Identity -->
+            <div class="flex items-center gap-3.5">
+                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 text-emerald-950 flex items-center justify-center shadow-md shrink-0">
+                    <i data-lucide="book-open-check" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <h1 class="text-base sm:text-lg font-extrabold tracking-tight text-white">Al-Hidayah Online Quran & Arabic Portal</h1>
+                        <span class="text-[11px] font-semibold bg-emerald-500/20 text-emerald-200 border border-emerald-400/30 px-2.5 py-0.5 rounded-full">Official Student Record</span>
+                    </div>
+                    <p class="text-xs text-emerald-200/90 mt-0.5">Student: <strong class="text-white">Nazif Al Kabir</strong> • Standalone Interactive Progress Portal</p>
+                </div>
+            </div>
+
+            <!-- Mode Switcher & Quick Actions -->
+            <div class="flex flex-wrap items-center gap-2.5 no-print">
+                <!-- Live Cloud Sync Status Badge -->
+                <div id="cloud-status-badge" class="bg-emerald-950/60 border border-emerald-700/60 px-3 py-1.5 rounded-xl text-[11px] font-semibold text-emerald-200 flex items-center gap-1.5">
+                    <span id="cloud-status-dot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                    <span id="cloud-status-text">Connecting Sync...</span>
+                </div>
+
+                <!-- Guardian Dedicated Portal Badge (Shown ONLY when ?mode=guardian is active) -->
+                <div id="guardian-locked-badge" class="hidden bg-emerald-500/20 border border-emerald-400/40 px-3.5 py-1.5 rounded-xl text-xs font-bold text-emerald-100 flex items-center gap-1.5">
+                    <i data-lucide="shield-check" class="w-4 h-4 text-emerald-300"></i>
+                    <span>Guardian Official Portal</span>
+                </div>
+
+                <!-- Teacher Controls Wrapper (Hidden when ?mode=guardian is active) -->
+                <div id="teacher-header-controls" class="flex flex-wrap items-center gap-2">
+                    <!-- Guardian vs Teacher Mode Toggle -->
+                    <div class="bg-emerald-950/80 p-1 rounded-xl border border-emerald-700/60 flex items-center">
+                        <button type="button" id="btn-mode-guardian" onclick="switchMode('guardian')" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 text-emerald-200 hover:text-white">
+                            <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                            <span>Guardian View</span>
+                        </button>
+                        <button type="button" id="btn-mode-teacher" onclick="switchMode('teacher')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-emerald-500 text-emerald-950 shadow-sm">
+                            <i data-lucide="pen-tool" class="w-3.5 h-3.5"></i>
+                            <span>Teacher Mode</span>
+                        </button>
+                    </div>
+
+                    <!-- Copy Dedicated Guardian Link Button -->
+                    <button type="button" onclick="copyGuardianLink()" class="bg-amber-400 hover:bg-amber-300 text-emerald-950 px-3.5 py-2 rounded-xl text-xs font-extrabold shadow-sm transition flex items-center gap-1.5" title="Copy read-only link for Guardian">
+                        <i data-lucide="link" class="w-3.5 h-3.5"></i>
+                        <span>Copy Guardian Link</span>
+                    </button>
+                </div>
+
+                <!-- Print / Save PDF -->
+                <button type="button" onclick="window.print()" class="bg-white/10 hover:bg-white/20 text-white border border-white/15 px-3 py-2 rounded-xl text-xs font-semibold transition flex items-center gap-1.5" title="Print or Save as PDF">
+                    <i data-lucide="printer" class="w-3.5 h-3.5 text-emerald-300"></i>
+                    <span class="hidden sm:inline">Print / PDF</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
+
+        <!-- PRO GUARDIAN SUMMARY DASHBOARD (Visible in both modes for complete clarity) -->
+        <section class="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-5">
+            <!-- Student Profile & Stats Card (7 cols) -->
+            <div class="md:col-span-7 bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-emerald-100 print-shadow-none flex flex-col justify-between">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+                    <div class="flex items-center gap-3.5">
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center font-extrabold text-lg">
+                            NK
+                        </div>
+                        <div>
+                            <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-600">Student Progress Overview</span>
+                            <h2 class="text-xl font-extrabold text-slate-900">Nazif Al Kabir</h2>
+                            <p class="text-xs text-slate-500 bangla">কুরআন তিলাওয়াত, নূরানী কায়দা, সূরা ও মাসআলা শিক্ষা</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 self-start sm:self-center">
+                        <span class="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            Active Student
+                        </span>
+                    </div>
+                </div>
+
+                <!-- 3 Key Metrics -->
+                <div class="grid grid-cols-3 gap-3 pt-4">
+                    <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
+                        <div class="text-[11px] font-semibold text-slate-500 uppercase">Classes Completed</div>
+                        <div id="stat-total-classes" class="text-2xl font-extrabold text-emerald-700 mt-0.5">23</div>
+                        <div class="text-[11px] text-slate-400 mt-0.5">Since Sep 27, 2026</div>
+                    </div>
+                    <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
+                        <div class="text-[11px] font-semibold text-slate-500 uppercase">Current Level</div>
+                        <div class="text-sm sm:text-base font-extrabold text-slate-800 mt-1 leading-tight">3 & 4 Alif Madd</div>
+                        <div class="text-[11px] text-emerald-600 font-medium mt-0.5">Qawmi Sabak 28</div>
+                    </div>
+                    <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-100">
+                        <div class="text-[11px] font-semibold text-slate-500 uppercase">Surahs & Duas</div>
+                        <div class="text-2xl font-extrabold text-teal-700 mt-0.5">9+</div>
+                        <div class="text-[11px] text-slate-400 mt-0.5">Memorized & Verified</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Memorized Surahs, Duas & Practical Milestones Card (5 cols) -->
+            <div class="md:col-span-5 bg-gradient-to-br from-emerald-900 to-teal-900 text-white rounded-2xl p-5 sm:p-6 shadow-sm flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-sm font-bold uppercase tracking-wider text-emerald-200 flex items-center gap-1.5">
+                            <i data-lucide="award" class="w-4 h-4 text-amber-300"></i>
+                            <span>Mastered Surahs, Duas & Masala</span>
+                        </h3>
+                        <span class="text-[11px] bg-white/10 px-2 py-0.5 rounded-md text-emerald-100">Verified</span>
+                    </div>
+                    <div class="flex flex-wrap gap-1.5">
+                        <span class="text-xs font-medium bg-white/15 border border-white/20 px-2.5 py-1 rounded-lg">Surah Al-Fatihah</span>
+                        <span class="text-xs font-medium bg-white/15 border border-white/20 px-2.5 py-1 rounded-lg">Surah Al-Ikhlas</span>
+                        <span class="text-xs font-medium bg-white/15 border border-white/20 px-2.5 py-1 rounded-lg">Surah Al-Falaq</span>
+                        <span class="text-xs font-medium bg-white/15 border border-white/20 px-2.5 py-1 rounded-lg">Surah An-Nas</span>
+                        <span class="text-xs font-semibold bg-amber-400/20 text-amber-200 border border-amber-300/30 px-2.5 py-1 rounded-lg">Surah Al-Fil (Full)</span>
+                        <span class="text-xs font-medium bg-white/15 border border-white/20 px-2.5 py-1 rounded-lg">Thana (Sana)</span>
+                        <span class="text-xs font-medium bg-white/15 border border-white/20 px-2.5 py-1 rounded-lg">Durood Sharif</span>
+                        <span class="text-xs font-semibold bg-emerald-400/20 text-emerald-200 border border-emerald-300/30 px-2.5 py-1 rounded-lg">7 Sunnahs of Wudu</span>
+                        <span class="text-xs font-semibold bg-emerald-400/20 text-emerald-200 border border-emerald-300/30 px-2.5 py-1 rounded-lg">4 Causes of Breaking Wudu</span>
+                        <span class="text-xs font-medium bg-white/15 border border-white/20 px-2.5 py-1 rounded-lg">Practical Namaz Training</span>
+                    </div>
+                </div>
+                <div class="mt-4 pt-3 border-t border-white/15 flex items-center justify-between text-xs text-emerald-100">
+                    <span class="bangla">নিয়মিত প্র্যাকটিক্যাল নামাজ ও তিলাওয়াত অনুশীলন চলছে</span>
+                    <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-300 shrink-0"></i>
+                </div>
+            </div>
+        </section>
+
+        <!-- TEACHER MODE WORKSPACE (Hidden when Guardian View is active) -->
+        <section id="teacher-workspace" class="hidden no-print space-y-6">
+            <div class="bg-white rounded-2xl shadow-sm border-2 border-emerald-500/30 overflow-hidden">
+                <div class="bg-emerald-50 px-5 py-4 border-b border-emerald-100 flex flex-wrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-sm">
+                            <i data-lucide="sparkles" class="w-5 h-5"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-base font-extrabold text-slate-900" id="form-heading">Add New Class & AI Note Formatter</h2>
+                            <p class="text-xs text-slate-600 bangla">সংক্ষেপে বাংলা বা Banglish-এ লিখুন—অ্যাপ নিজে থেকেই ইংরেজি ও বাংলা রিপোর্ট তৈরি করে সেভ করবে</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button type="button" onclick="fillSampleTeacherNote()" class="text-xs font-semibold text-emerald-700 hover:text-emerald-900 bg-white border border-emerald-200 px-3 py-1.5 rounded-lg transition">
+                            Sample Note
+                        </button>
+                        <button type="button" id="cancel-edit-btn" onclick="resetFormToNew()" class="hidden text-xs font-semibold text-rose-700 bg-rose-50 border border-rose-200 px-3 py-1.5 rounded-lg transition">
+                            Cancel Edit
+                        </button>
+                    </div>
+                </div>
+
+                <form id="class-entry-form" class="p-5 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-5">
+                    <input type="hidden" id="edit-record-id" value="">
+
+                    <!-- Left Inputs (5 cols) -->
+                    <div class="lg:col-span-5 space-y-4">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Date (তারিখ)</label>
+                                <input type="date" id="f-date" required class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Class No. (ক্লাস নং)</label>
+                                <input type="text" id="f-class-no" placeholder="Class 24" required class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Class Time (সময়)</label>
+                                <input type="text" id="f-time" value="5:15 AM - 6:00 AM" required class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-600 uppercase mb-1">Status</label>
+                                <select id="f-status" class="w-full rounded-xl border border-slate-200 px-3 py-2 text-sm bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                    <option value="present">Class Held (Present)</option>
+                                    <option value="absent">No Class (Student Absent)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 uppercase mb-1.5">Books Covered (বই নির্বাচন করুন)</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <label class="flex items-center gap-2 p-2 rounded-xl border border-slate-200 text-xs font-medium cursor-pointer hover:bg-emerald-50/40">
+                                    <input type="checkbox" name="f-books" value="Qawmi Qaida (Noorani Qaida)" checked class="rounded text-emerald-600">
+                                    <span>Qawmi / Noorani Qaida</span>
+                                </label>
+                                <label class="flex items-center gap-2 p-2 rounded-xl border border-slate-200 text-xs font-medium cursor-pointer hover:bg-emerald-50/40">
+                                    <input type="checkbox" name="f-books" value="10 Minute School PDF" checked class="rounded text-emerald-600">
+                                    <span>10 Minute School PDF</span>
+                                </label>
+                                <label class="flex items-center gap-2 p-2 rounded-xl border border-slate-200 text-xs font-medium cursor-pointer hover:bg-emerald-50/40">
+                                    <input type="checkbox" name="f-books" value="Rahe Najat" class="rounded text-emerald-600">
+                                    <span>Rahe Najat</span>
+                                </label>
+                                <label class="flex items-center gap-2 p-2 rounded-xl border border-slate-200 text-xs font-medium cursor-pointer hover:bg-emerald-50/40">
+                                    <input type="checkbox" name="f-books" value="Surah & Dua" checked class="rounded text-emerald-600">
+                                    <span>Surah & Dua</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Raw Notes & AI Submit (7 cols) -->
+                    <div class="lg:col-span-7 flex flex-col justify-between space-y-4">
+                        <div>
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="block text-xs font-bold text-slate-600 uppercase">Quick Class Notes (Banglish / বাংলা / English)</label>
+                                <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">Auto-Corrects Spelling + Bilingual</span>
+                            </div>
+                            <textarea id="f-raw-notes" rows="4" required placeholder="যেমন: ager diner ojur sunnat 7 ti shunchi, ajke qawmi kayda 29 sabak 4 line poraisi, sura nasr 2 line mukhosto koraisi, ar namajer niyot shikhaisi..." class="w-full rounded-xl border border-slate-200 p-3.5 text-sm bangla bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-emerald-500 leading-relaxed"></textarea>
+                            <p class="text-[11px] text-slate-400 mt-1 bangla">নোট লিখে নিচের বাটনে ক্লিক করলে সুন্দর ইংরেজি ও বাংলা রিপোর্ট তৈরি হয়ে সরাসরি পোর্টালে সেভ হয়ে যাবে।</p>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-3">
+                            <button type="submit" id="btn-save-class" class="flex-grow bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold py-3 px-5 rounded-xl shadow-md transition flex items-center justify-center gap-2 text-sm">
+                                <i data-lucide="wand-2" class="w-4 h-4"></i>
+                                <span>Generate & Save Class to Portal</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- FILTER, BACKUP & PORTAL CONTROLS BAR -->
+        <section class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200/80 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 no-print">
+            <!-- Search & Month Filter -->
+            <div class="flex flex-wrap items-center gap-2.5">
+                <div class="relative flex-grow sm:flex-grow-0">
+                    <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                    <input type="text" id="filter-search" oninput="renderClassCards()" placeholder="Search Surah, Sabak, Class..." class="pl-9 pr-3.5 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 w-full sm:w-64">
+                </div>
+                <select id="filter-month" onchange="renderClassCards()" class="rounded-xl border border-slate-200 px-3 py-2 text-xs sm:text-sm text-slate-700 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    <option value="all">All Months (Sep - Nov 2026)</option>
+                    <option value="2026-11">November 2026</option>
+                    <option value="2026-10">October 2026</option>
+                    <option value="2026-09">September 2026</option>
+                </select>
+                <div class="bg-slate-100 p-1 rounded-xl flex text-xs">
+                    <button type="button" id="card-lang-both" onclick="setCardLanguage('both')" class="px-2.5 py-1 rounded-lg bg-white text-slate-900 font-bold shadow-xs">EN + বাংলা</button>
+                    <button type="button" id="card-lang-bn" onclick="setCardLanguage('bn')" class="px-2.5 py-1 rounded-lg text-slate-600 font-medium">বাংলা</button>
+                    <button type="button" id="card-lang-en" onclick="setCardLanguage('en')" class="px-2.5 py-1 rounded-lg text-slate-600 font-medium">English</button>
+                </div>
+            </div>
+
+            <!-- Backup, Restore & Standalone Download Tools -->
+            <div class="flex flex-wrap items-center gap-2">
+                <div id="teacher-backup-controls" class="flex flex-wrap items-center gap-2">
+                    <button type="button" onclick="exportBackupJSON()" class="text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-xl transition flex items-center gap-1.5" title="Download backup file to keep safe">
+                        <i data-lucide="download" class="w-3.5 h-3.5 text-emerald-700"></i>
+                        <span>Save Backup</span>
+                    </button>
+                    <label class="text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2 rounded-xl transition flex items-center gap-1.5 cursor-pointer" title="Restore from a saved backup file">
+                        <i data-lucide="upload" class="w-3.5 h-3.5 text-teal-700"></i>
+                        <span>Load Backup</span>
+                        <input type="file" id="import-json-input" accept=".json" onchange="importBackupJSON(event)" class="hidden">
+                    </label>
+                    <button type="button" id="btn-reset-default" onclick="confirmResetDefault()" class="text-xs font-semibold bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 px-3 py-2 rounded-xl transition flex items-center gap-1.5">
+                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                        <span>Reset 24 Classes</span>
+                    </button>
+                </div>
+                <button type="button" onclick="exportCSV()" class="text-xs font-semibold bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 px-3 py-2 rounded-xl transition flex items-center gap-1.5">
+                    <i data-lucide="file-spreadsheet" class="w-3.5 h-3.5"></i>
+                    <span>CSV</span>
+                </button>
+            </div>
+        </section>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // =========================================================================
+        // 1. PRE-LOADED 24 HISTORICAL CLASS RECORDS (CLASS 01 TO CLASS 23)
+        // =========================================================================
+        const DEFAULT_RECORDS = [
+            {"Date":"2026-09-27","Class No.":"Class 01","Time":"4:00 AM - 5:00 AM","Student Name":"Nazif Al Kabir","Book Name":"10 Minute School PDF","Topics":"Muktoboron Porichoy (Introductions). Read letters 10 times each.","Review":"N/A (First Class)","Note":"Practice basic pronunciation at home.","BnTopics":"১০ মিনিট স্কুল পিডিএফ থেকে মুক্তবর্ণ পরিচয় পড়ানো হয়েছে এবং প্রতিটি হরফ ১০ বার করে অনুশীলন করানো হয়েছে।","BnReview":"প্রথম ক্লাস (নতুন শুরু)।","BnNote":"বাসায় প্রতিটি হরফের সঠিক উচ্চারণ অনুশীলন করার পরামর্শ দেওয়া হলো।"},
+            {"Date":"2026-09-28","Class No.":"Class 02","Time":"4:00 AM - 5:00 AM","Student Name":"Nazif Al Kabir","Book Name":"10 Minute School PDF","Topics":"Covered Parts 2, 3, 4, and 5 of the PDF.","Review":"Correctly recited previous letters through interactive questioning.","Note":"Sent YouTube practice links for ث, ح, ف, ه. Homework assigned to write and identify letters for next class.","BnTopics":"১০ মিনিট স্কুল পিডিএফ-এর ২, ৩, ৪ ও ৫ নম্বর পর্ব পড়ানো হয়েছে।","BnReview":"প্রশ্নোত্তরের মাধ্যমে আগের ক্লাসের হরফগুলো সঠিকভাবে শুনিয়েছে।","BnNote":"ث, ح, ف, ه হরফগুলো অনুশীলনের জন্য ইউটিউব লিংক দেওয়া হয়েছে এবং হরফ লিখে চেনার বাড়ির কাজ দেওয়া হয়েছে।"},
+            {"Date":"2026-10-01","Class No.":"Class 03","Time":"4:19 AM - 5:20 AM","Student Name":"Nazif Al Kabir","Book Name":"10 Minute School PDF","Topics":"Completed Lesson 1 (up to Page 9 total): Parts 1-5 (Intro, Fill-in-the-blanks, Bangla pronunciation, Nukta letters). Started Lesson 2 (Parts 1-6).","Review":"Good recall of homework letters and previous parts.","Note":"Review Lesson 1 & 2 components thoroughly.","BnTopics":"১ম পাঠ (পৃষ্ঠা ৯ পর্যন্ত: শূন্যস্থান পূরণ, বাংলা উচ্চারণ ও নুকতাযুক্ত হরফ) সম্পন্ন হয়েছে এবং ২য় পাঠ (পর্ব ১-৬) শুরু করা হয়েছে।","BnReview":"বাড়ির কাজের হরফগুলো ভালোভাবে মনে রাখতে পেরেছে।","BnNote":"১ম ও ২য় পাঠের বিষয়গুলো ভালোভাবে রিভিশন দেওয়ার অনুরোধ রইল।"},
+            {"Date":"2026-10-04","Class No.":"Class 04","Time":"4:00 AM - 5:00 AM","Student Name":"Nazif Al Kabir","Book Name":"Noorani Qaida & 10 Minute School PDF","Topics":"Reviewed lessons 1-2. Started Noorani Qaida (Page 2, Sobok 4, and 2 lines of Sobok 5).","Review":"Successfully tested on previous lessons 1 and 2.","Note":"Prepare Noorani Qaida Sobok 5 (first 2 lines) for the next session.","BnTopics":"১ম ও ২য় পাঠ রিভিউ করা হয়েছে এবং নূরানী কায়দা (পৃষ্ঠা ২, সবক ৪ ও সবক ৫-এর ২ লাইন) শুরু করা হয়েছে।","BnReview":"আগের ১ম ও ২য় পাঠের পরীক্ষায় সফলভাবে উত্তর দিয়েছে।","BnNote":"পরবর্তী ক্লাসের জন্য নূরানী কায়দার সবক ৫-এর প্রথম ২ লাইন প্রস্তুতি নেওয়ার নির্দেশ দেওয়া হয়েছে।"},
+            {"Date":"2026-10-05","Class No.":"Class 05","Time":"4:45 AM - 5:45 AM","Student Name":"Nazif Al Kabir","Book Name":"Noorani Qaida","Topics":"Heard Noorani Qaida Sobok 5 (lines 3 to 8) and Sobok 6 (3 lines).","Review":"Recited the assigned lines from Sobok 5 well.","Note":"Keep practicing Sobok 5 and 6 fluently.","BnTopics":"নূরানী কায়দার সবক ৫ (৩ থেকে ৮ নম্বর লাইন) এবং সবক ৬-এর ৩ লাইন পড়ানো ও শোনা হয়েছে।","BnReview":"সবক ৫-এর নির্ধারিত লাইনগুলো সুন্দরভাবে শুনিয়েছে।","BnNote":"সবক ৫ ও ৬ সাবলীলভাবে পড়ার অনুশীলন চালিয়ে যেতে হবে।"},
+            {"Date":"2026-10-08","Class No.":"Class 06","Time":"4:30 AM - 5:30 AM","Student Name":"Nazif Al Kabir","Book Name":"Noorani Qaida","Topics":"Noorani Qaida - Lesson 6: Taa to Qaaf (Pora 6 - Ta theke Kaf)","Review":"Completed - Previous lesson heard and reviewed (Sobok 5 & 6)","Note":"Regular revision of Taa to Qaaf.","BnTopics":"নূরানী কায়দার ৬ নম্বর পাঠ: তা থেকে ক্বাফ পর্যন্ত পড়া অনুশীলন করানো হয়েছে।","BnReview":"আগের সবক ৫ ও ৬ শোনা ও রিভিউ সম্পন্ন হয়েছে।","BnNote":"তা থেকে ক্বাফ পর্যন্ত হরফগুলো নিয়মিত রিভিশন দিতে হবে।"},
+            {"Date":"2026-10-12","Class No.":"Class 06 (B)","Time":"4:07 AM - 5:20 AM","Student Name":"Nazif Al Kabir","Book Name":"Noorani Qaida & 10 Minute School PDF","Topics":"Noorani Qaida Sabak 6 & 10 Minute School Lesson 11","Review":"Completed - Previous lesson heard and reviewed (Sabak 6)","Note":"Continue practicing Sabak 6 and Lesson 11.","BnTopics":"নূরানী কায়দার সবক ৬ এবং ১০ মিনিট স্কুল পিডিএফ-এর ১১ নম্বর পাঠ পড়ানো হয়েছে।","BnReview":"আগের সবক ৬ শোনা ও যাচাই করা হয়েছে।","BnNote":"সবক ৬ এবং ১১ নম্বর পাঠ অনুশীলন অব্যাহত রাখতে হবে।"},
+            {"Date":"2026-10-13","Class No.":"Class 07","Time":"4:06 AM - 5:10 AM","Student Name":"Nazif Al Kabir","Book Name":"10 Minute School PDF","Topics":"10 Minute School - Class 12","Review":"Completed - Previous lesson heard and reviewed (Sabak 6 & Lesson 11)","Note":"Practice Class 12 exercises.","BnTopics":"১০ মিনিট স্কুল পিডিএফ-এর ১২তম ক্লাসের পাঠ পড়ানো হয়েছে।","BnReview":"আগের সবক ৬ এবং ১১ নম্বর পাঠ শোনা হয়েছে।","BnNote":"১২তম ক্লাসের অনুশীলনীগুলো বাসায় প্র্যাকটিস করতে হবে।"},
+            {"Date":"2026-10-15","Class No.":"Class 08","Time":"4:10 AM - 5:10 AM","Student Name":"Nazif Al Kabir","Book Name":"10 Minute School PDF","Topics":"10 Minute School - Class 13 (Chapter 1)","Review":"Completed - Previous lesson reviewed (Class 12)","Note":"Review Chapter 1 of Class 13.","BnTopics":"১০ মিনিট স্কুল পিডিএফ-এর ১৩তম ক্লাসের ১ম অধ্যায় পড়ানো হয়েছে।","BnReview":"১২তম ক্লাসের পড়া রিভিউ করা হয়েছে।","BnNote":"১৩তম ক্লাসের ১ম অধ্যায় ভালোভাবে রিভিশন দিতে হবে।"},
+            {"Date":"2026-10-19","Class No.":"Class 09","Time":"04:10 AM","Student Name":"Nazif Al Kabir","Book Name":"No Class (Absent)","Topics":"No class held - Student was away","Review":"N/A - Class not held (Student absent)","Note":"Student was away; class was not conducted.","absent":true,"BnTopics":"শিক্ষার্থী বাইরে থাকায় এই দিনে ক্লাস অনুষ্ঠিত হয়নি।","BnReview":"ক্লাস অনুষ্ঠিত হয়নি।","BnNote":"পরবর্তী নির্ধারিত সময়ে নিয়মিত ক্লাস চলবে।"},
+            {"Date":"2026-10-20","Class No.":"Class 10","Time":"4:10 AM - 5:15 AM","Student Name":"Nazif Al Kabir","Book Name":"Noorani Qaida & 10 Minute School PDF","Topics":"10 Minute School Class 13, Noorani Qaida Sabak 11 & Durood Sharif","Review":"Completed - Previous lesson reviewed (Class 13 Chapter 1)","Note":"Practice Sabak 11 and Durood Sharif.","BnTopics":"১০ মিনিট স্কুল ক্লাস ১৩, নূরানী কায়দার সবক ১১ এবং দরূদ শরীফ পড়ানো হয়েছে।","BnReview":"আগের ক্লাস ১৩-এর ১ম অধ্যায় শোনা হয়েছে।","BnNote":"সবক ১১ ও দরূদ শরীফ নিয়মিত অনুশীলন করতে হবে।"},
+            {"Date":"2026-10-21","Class No.":"Class 11","Time":"4:15 AM - 5:22 AM","Student Name":"Nazif Al Kabir","Book Name":"Noorani Qaida & 10 Minute School PDF","Topics":"10 Minute School Class 13, Noorani Qaida Sabak 11 & Durood Sharif","Review":"Completed - Previous sabak heard & practiced (Sabak 11 & Durood Sharif)","Note":"Good progress on Durood Sharif.","BnTopics":"১০ মিনিট স্কুল ক্লাস ১৩, নূরানী কায়দা সবক ১১ এবং দরূদ শরীফ অনুশীলন করানো হয়েছে।","BnReview":"আগের সবক ১১ ও দরূদ শরীফ শোনা হয়েছে।","BnNote":"দরূদ শরীফ মুখস্থ ও উচ্চারণে ভালো উন্নতি হচ্ছে।"},
+            {"Date":"2026-10-26","Class No.":"Class 12","Time":"4:07 AM - 5:07 AM","Student Name":"Nazif Al Kabir","Book Name":"10 Minute School PDF","Topics":"10 Minute School - Class 14 (Parts 1-4 covered)","Review":"Completed - Previous lesson heard and reviewed (Sabak 11 & Class 13)","Note":"Revise Class 14 Parts 1-4.","BnTopics":"১০ মিনিট স্কুল পিডিএফ-এর ১৪তম ক্লাসের ১ থেকে ৪ নম্বর পর্ব পড়ানো হয়েছে।","BnReview":"আগের সবক ১১ ও ক্লাস ১৩ শোনা হয়েছে।","BnNote":"১৪তম ক্লাসের ১-৪ পর্ব বাসায় রিভিশন দিতে হবে।"},
+            {"Date":"2026-10-27","Class No.":"Class 13","Time":"4:20 AM - 5:20 AM","Student Name":"Nazif Al Kabir","Book Name":"10 Minute School PDF","Topics":"10 Minute School - Class 14 (Parts 1-4 covered)","Review":"Completed - Previous lesson reviewed (Class 14 Parts 1-4)","Note":"Practice pronunciation clearly.","BnTopics":"১০ মিনিট স্কুল পিডিএফ-এর ১৪তম ক্লাসের ১-৪ পর্ব পুনরায় অনুশীলন করানো হয়েছে।","BnReview":"আগের ক্লাস ১৪-এর পড়া যাচাই করা হয়েছে।","BnNote":"প্রতিটি শব্দের উচ্চারণ স্পষ্টভাবে অনুশীলন করার পরামর্শ রইল।"},
+            {"Date":"2026-10-29","Class No.":"Class 14","Time":"4:27 AM - 5:27 AM","Student Name":"Nazif Al Kabir","Book Name":"Noorani Qaida & 10 Minute School PDF","Topics":"10 Minute School - Class 16 (Lessons 1-2 covered)","Review":"Completed - Previous lesson reviewed (Class 14)","Note":"Prepare Lessons 1-2 of Class 16.","BnTopics":"১০ মিনিট স্কুল পিডিএফ-এর ১৬তম ক্লাসের ১ ও ২ নম্বর পাঠ পড়ানো হয়েছে।","BnReview":"আগের ১৪তম ক্লাসের পড়া শোনা হয়েছে।","BnNote":"১৬তম ক্লাসের ১ ও ২ নম্বর পাঠ ভালোভাবে প্রস্তুতি নিতে হবে।"},
+            {"Date":"2026-11-01","Class No.":"Class 15","Time":"4:05 AM - 4:54 AM","Student Name":"Nazif Al Kabir","Book Name":"Noorani Qaida","Topics":"Noorani Qaida - Sabak 12 Recitation & Practice","Review":"Completed - Sabak 12 heard","Note":"Fluency improving in Sabak 12.","BnTopics":"নূরানী কায়দার সবক ১২ তিলাওয়াত ও অনুশীলন করানো হয়েছে।","BnReview":"সবক ১২-এর পড়া শোনা হয়েছে।","BnNote":"সবক ১২ পড়ার গতি ও সাবলীলতা আগের চেয়ে উন্নত হয়েছে।"},
+            {"Date":"2026-11-02","Class No.":"Class 16","Time":"6:01 AM - 7:01 AM","Student Name":"Nazif Al Kabir","Book Name":"Noorani Qaida & 10 Minute School PDF","Topics":"Noorani Qaida Sabak 13 & 10 Minute School Class 16 (Parts 1-4)","Review":"Completed - Sabak heard","Note":"Continue practicing Sabak 13.","BnTopics":"নূরানী কায়দার সবক ১৩ এবং ১০ মিনিট স্কুল ক্লাস ১৬-এর ১ থেকে ৪ পর্ব পড়ানো হয়েছে।","BnReview":"আগের সবক শোনা হয়েছে।","BnNote":"সবক ১৩ নিয়মিত অনুশীলন চালিয়ে যেতে হবে।"},
+            {"Date":"2026-11-03","Class No.":"Class 17","Time":"Regular Session","Student Name":"Nazif Al Kabir","Book Name":"Noorani Qaida & 10 Minute School PDF","Topics":"Noorani Qaida & 10 Minute School Class 17","Review":"Completed - Previous sabak heard & reviewed","Note":"Regular revision completed.","BnTopics":"নূরানী কায়দা এবং ১০ মিনিট স্কুল পিডিএফ-এর ১৭তম ক্লাস পড়ানো হয়েছে।","BnReview":"আগের সবক শোনা ও রিভিউ করা হয়েছে।","BnNote":"নিয়মিত রিভিশন সম্পন্ন হয়েছে।"},
+            {"Date":"2026-11-05","Class No.":"Class 18","Time":"40 Minutes","Student Name":"Nazif Al Kabir","Book Name":"Noorani Qaida","Topics":"Noorani Qaida - Sabak 14 (New Sabak) + Sana memorization completed & daily practical Namaz practice","Review":"Completed - Tested on 14 Qaida chapters; answered successfully","Note":"Sana memorization completed. Practical Namaz training taught step-by-step.","BnTopics":"নূরানী কায়দার নতুন সবক ১৪ পড়ানো হয়েছে, ছানা সম্পূর্ণ মুখস্থ করানো হয়েছে এবং প্রতিদিনের প্র্যাকটিক্যাল নামাজ অনুশীলন করানো হয়েছে।","BnReview":"কায়দার ১৪টি অধ্যায়ের ওপর পরীক্ষা নেওয়া হয়েছে এবং সফলভাবে উত্তর দিয়েছে।","BnNote":"ছানা মুখস্থ সম্পন্ন হয়েছে। ধাপে ধাপে প্র্যাকটিক্যাল নামাজ শেখানো হচ্ছে।"},
+            {"Date":"2026-11-09","Class No.":"Class 19","Time":"40 Minutes","Student Name":"Nazif Al Kabir","Book Name":"Noorani Qaida","Topics":"Noorani Qaida - Sabak 15 + Duas & Surahs (Al-Fatiha, Al-Ikhlas, Al-Falaq, An-Nas) memorization reviewed & corrected; Daily practical Namaz practice","Review":"Completed - Previous sabak heard & reviewed (Sabak 14)","Note":"Duas and Surahs (Al-Fatiha, Al-Ikhlas, Al-Falaq, An-Nas) memorization checked and corrected. Practical Namaz practice taught daily.","BnTopics":"নূরানী কায়দার সবক ১৫ পড়ানো হয়েছে; দোয়া এবং সূরা ফাতিহা, সূরা ইখলাস, সূরা ফালাক ও সূরা নাস-এর মুখস্থ পড়া শুদ্ধ করে দেওয়া হয়েছে। পাশাপাশি প্র্যাকটিক্যাল নামাজ শেখানো হয়েছে।","BnReview":"আগের সবক ১৪ শোনা ও যাচাই করা হয়েছে।","BnNote":"সূরা ফাতিহা ও শেষ ৩ সূরার উচ্চারণ ও মুখস্থ যাচাই করে শুদ্ধ করে দেওয়া হয়েছে।"},
+            {"Date":"2026-11-10","Class No.":"Class 20","Time":"5:54 AM - 6:54 AM","Student Name":"Nazif Al Kabir","Book Name":"Noorani Qaida & 10 Minute School PDF","Topics":"Noorani Qaida Sabak 15 & 10 Minute School Class 20 (Lesson 1) + Surah Al-Fil (1st line memorized) + Sana & Duas review; Daily practical Namaz practice","Review":"Completed - Sabak 15 heard & reviewed","Note":"Reviewed Sana, Duas, and Surahs. Daily practical Namaz practice taught step-by-step.","BnTopics":"নূরানী কায়দা সবক ১৫, ১০ মিনিট স্কুল ক্লাস ২০ (১ম পাঠ), সূরা ফীলের ১ম লাইন মুখস্থ করানো হয়েছে এবং ছানা, দোয়া ও প্র্যাকটিক্যাল নামাজ অনুশীলন করানো হয়েছে।","BnReview":"সবক ১৫-এর পড়া শোনা ও রিভিউ করা হয়েছে।","BnNote":"ছানা, দোয়া ও সূরাসমূহ রিভিশন দেওয়া হয়েছে এবং প্র্যাকটিক্যাল নামাজ শেখানো হচ্ছে।"},
+            {"Date":"2026-11-13","Class No.":"Class 21","Time":"4:50 AM - 6:40 AM","Student Name":"Nazif Al Kabir","Book Name":"Qawmi Qaida (Noorani Qaida) & 10 Minute School PDF","Topics":"10 Minute School PDF Class 20 (Part 2): Explained 3 Alif Madd rule & read 3 new lines + Surah Al-Fil (3 lines memorized)","Review":"Completed - Heard 10 Minute School Class 20 (Part 1) & tested from Qawmi Qaida","Note":"Makeup class for 2026-11-12 (conducted on Nov 13). Practice 3 Alif Madd (3 lines) and Surah Al-Fil (3 lines).","BnTopics":"১০ মিনিট স্কুল পিডিএফ-এর ২০তম ক্লাসের ২য় পর্ব থেকে ৩ আলিফ মদ্দের নিয়ম বুঝিয়ে নতুন ৩ লাইন পড়ানো হয়েছে এবং সূরা ফীলের ৩ লাইন মুখস্থ করানো হয়েছে।","BnReview":"১০ মিনিট স্কুল ২০তম ক্লাসের ১ম পর্ব শোনা হয়েছে এবং কওমি কায়দা থেকে পরীক্ষা নেওয়া হয়েছে।","BnNote":"১২ নভেম্বরের নির্ধারিত ক্লাসটির মেকআপ ক্লাস হিসেবে ১৩ নভেম্বর নেওয়া হয়েছে। ৩ আলিফ মদ্দ ও সূরা ফীলের ৩ লাইন অনুশীলনের পরামর্শ রইল।"},
+            {"Date":"2026-11-16","Class No.":"Class 22","Time":"4:10 AM - 5:10 AM","Student Name":"Nazif Al Kabir","Book Name":"Qawmi Qaida (Noorani Qaida) & 10 Minute School PDF","Topics":"10 Minute School PDF Class 20 (Part 1: 4 Alif Madd & Part 2: 2 lines of 3 Alif Madd), Qawmi Qaida Sabak 28 (4 Alif Madd), and Surah Al-Fil (full Surah memorized)","Review":"Completed - Previous sabak & Surah Al-Fil lines heard and reviewed","Note":"Practiced 4 Alif Madd and 3 Alif Madd. Completed full memorization of Surah Al-Fil.","BnTopics":"১০ মিনিট স্কুল পিডিএফ-এর ২০তম ক্লাসের ১ম পর্ব (৪ আলিফ মদ্দ) ও ২য় পর্বের ৩ আলিফ টানের ২ লাইন, কওমি কায়দার ২৮ নম্বর সবক (৪ আলিফ মদ্দ) এবং সম্পূর্ণ সূরা ফীল মুখস্থ করানো হয়েছে।","BnReview":"আগের সবক ও সূরা ফীলের লাইনগুলো শোনা হয়েছে।","BnNote":"৪ আলিফ ও ৩ আলিফ মদ্দ অনুশীলন করানো হয়েছে এবং সম্পূর্ণ সূরা ফীল মুখস্থ সম্পন্ন হয়েছে।"},
+            {"Date":"2026-11-17","Class No.":"Class 23","Time":"5:15 AM - 6:00 AM","Student Name":"Nazif Al Kabir","Book Name":"Qawmi Qaida (Noorani Qaida), 10 Minute School PDF & Rahe Najat","Topics":"10 Minute School PDF Class 20 (Part 2: 3 Alif Madd completed), Qawmi Qaida (2-3 lines), 7 Sunnahs of Wudu (memorized), and 4 Causes of Breaking Wudu from Rahe Najat (taught & heard memorized)","Review":"Completed - Full Surah Al-Fil heard memorized","Note":"Recited full Surah Al-Fil from memory. Memorized 7 Sunnahs of Wudu and 4 causes of breaking Wudu from Rahe Najat.","BnTopics":"১০ মিনিট স্কুল পিডিএফ-এর ২০তম ক্লাসের ২য় পর্বের ৩ আলিফ টানের অংশ সম্পূর্ণ শেষ করা হয়েছে, কায়দা থেকে ২-৩ লাইন পড়ানো হয়েছে, অজুর ৭টি সুন্নত মুখস্থ করানো হয়েছে এবং রাহে নাজাত থেকে অজু ভঙ্গের ৪টি কারণ পড়ানো ও মুখস্থ শোনা হয়েছে।","BnReview":"সম্পূর্ণ সূরা ফীল মুখস্থ শোনা হয়েছে।","BnNote":"সম্পূর্ণ সূরা ফীল মুখস্থ শুনিয়েছে এবং রাহে নাজাত থেকে অজুর ৭টি সুন্নত ও অজু ভঙ্গের ৪টি কারণ মুখস্থ সম্পন্ন করেছে।"}
+        ];
+
+        // =========================================================================
+        // 2. URL LINK MODE & FIREBASE CLOUD INITIALIZATION
+        // =========================================================================
+        const urlParams = new URLSearchParams(window.location.search);
+        const IS_GUARDIAN_LOCKED = urlParams.get('mode') === 'guardian';
+
+        let records = DEFAULT_RECORDS.map((r, idx) => ({ id: String(1000 + idx), ...r }));
+        let currentMode = IS_GUARDIAN_LOCKED ? 'guardian' : 'teacher';
+        let cardLang = 'both';
+        let db = null;
+        let auth = null;
+        let currentUser = null;
+        let isCloudReady = false;
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'nazif-quran-portal';
+
+        function getClassesCollectionRef() {
+            return collection(db, 'artifacts', appId, 'public', 'data', 'nazif_classes');
+        }
+
+        function updateSyncStatus(state, label) {
+            const dot = document.getElementById('cloud-status-dot');
+            const text = document.getElementById('cloud-status-text');
+            if (!dot || !text) return;
+            text.textContent = label;
+            if (state === 'live') {
+                dot.className = "w-2 h-2 rounded-full bg-emerald-400";
+            } else if (state === 'syncing') {
+                dot.className = "w-2 h-2 rounded-full bg-amber-400 animate-pulse";
+            } else {
+                dot.className = "w-2 h-2 rounded-full bg-rose-400";
+            }
+        }
+
+        async function initFirebaseCloudSync() {
+            try {
+                if (typeof __firebase_config === 'undefined' || !__firebase_config) {
+                    updateSyncStatus('offline', 'Standalone Mode');
+                    return;
+                }
+                const firebaseConfig = JSON.parse(__firebase_config);
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                onAuthStateChanged(auth, async (user) => {
+                    if (!user) return;
+                    currentUser = user;
+                    isCloudReady = true;
+
+                    const colRef = getClassesCollectionRef();
+                    onSnapshot(colRef, async (snapshot) => {
+                        if (snapshot.empty) {
+                            // Seed initial 24 classes to cloud on first launch
+                            if (!IS_GUARDIAN_LOCKED) {
+                                await seedDefaultRecordsToCloud();
+                            }
+                        } else {
+                            const cloudDocs = [];
+                            snapshot.forEach((docSnap) => {
+                                cloudDocs.push({ id: docSnap.id, ...docSnap.data() });
+                            });
+                            records = cloudDocs;
+                            renderStats();
+                            renderClassCards();
+                            initFormDefaults();
+                        }
+                        updateSyncStatus('live', 'Live Cloud Sync');
+                    }, (err) => {
+                        console.error("Firestore sync error:", err);
+                        updateSyncStatus('offline', 'Sync Warning');
+                    });
+                });
+            } catch (err) {
+                console.error("Firebase init error:", err);
+                updateSyncStatus('offline', 'Offline Mode');
+            }
+        }
+
+        async function seedDefaultRecordsToCloud() {
+            if (!db || !currentUser) return;
+            try {
+                const batch = writeBatch(db);
+                DEFAULT_RECORDS.forEach((rec, idx) => {
+                    const docId = String(1000 + idx);
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'nazif_classes', docId);
+                    batch.set(docRef, { id: docId, ...rec });
+                });
+                await batch.commit();
+            } catch (e) {
+                console.error("Seed error:", e);
+            }
+        }
+
+        async function persistSingleRecord(entry) {
+            const docId = String(entry.id);
+            const idx = records.findIndex(r => String(r.id) === docId);
+            if (idx !== -1) {
+                records[idx] = { ...entry, id: docId };
+            } else {
+                records.unshift({ ...entry, id: docId });
+            }
+            renderStats();
+            renderClassCards();
+
+            if (isCloudReady && db && currentUser) {
+                updateSyncStatus('syncing', 'Saving to Cloud...');
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'nazif_classes', docId);
+                await setDoc(docRef, { ...entry, id: docId });
+                updateSyncStatus('live', 'Live Cloud Sync');
+            }
+        }
+
+        async function removeSingleRecord(id) {
+            const docId = String(id);
+            records = records.filter(r => String(r.id) !== docId);
+            renderStats();
+            renderClassCards();
+
+            if (isCloudReady && db && currentUser) {
+                updateSyncStatus('syncing', 'Updating Cloud...');
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'nazif_classes', docId);
+                await deleteDoc(docRef);
+                updateSyncStatus('live', 'Live Cloud Sync');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            applyLinkAccessRules();
+            initFormDefaults();
+            renderStats();
+            renderClassCards();
+            lucide.createIcons();
+            initFirebaseCloudSync();
+        });
+
+        function applyLinkAccessRules() {
+            const headerControls = document.getElementById('teacher-header-controls');
+            const guardianLockedBadge = document.getElementById('guardian-locked-badge');
+            const backupControls = document.getElementById('teacher-backup-controls');
+
+            if (IS_GUARDIAN_LOCKED) {
+                // Strictly lock interface into read-only Guardian View
+                if (headerControls) headerControls.classList.add('hidden');
+                if (backupControls) backupControls.classList.add('hidden');
+                if (guardianLockedBadge) guardianLockedBadge.classList.remove('hidden');
+                switchMode('guardian');
+            } else {
+                // Teacher default link: show both toggles and start in Teacher Mode
+                if (headerControls) headerControls.classList.remove('hidden');
+                if (backupControls) backupControls.classList.remove('hidden');
+                if (guardianLockedBadge) guardianLockedBadge.classList.add('hidden');
+                switchMode('teacher');
+            }
+        }
+
+        function copyGuardianLink() {
+            const guardianUrl = window.location.origin + window.location.pathname + '?mode=guardian';
+            copyToClipboard(guardianUrl, "Guardian Link copied! Share this link with the guardian.");
+        }
+
+        function initFormDefaults() {
+            const today = new Date().toISOString().split('T')[0];
+            const dateInput = document.getElementById('f-date');
+            const classInput = document.getElementById('f-class-no');
+            if (dateInput && !document.getElementById('edit-record-id').value) {
+                dateInput.value = today;
+            }
+            if (classInput && !document.getElementById('edit-record-id').value) {
+                const nextNum = records.length > 0 ? 24 + Math.max(0, records.length - DEFAULT_RECORDS.length) : 24;
+                classInput.value = `Class ${nextNum}`;
+            }
+        }
+
+        // =========================================================================
+        // 3. MODE & LANGUAGE SWITCHING
+        // =========================================================================
+        function switchMode(mode) {
+            if (IS_GUARDIAN_LOCKED && mode === 'teacher') return;
+            currentMode = mode;
+            const teacherSec = document.getElementById('teacher-workspace');
+            const btnGuardian = document.getElementById('btn-mode-guardian');
+            const btnTeacher = document.getElementById('btn-mode-teacher');
+
+            if (mode === 'teacher') {
+                teacherSec.classList.remove('hidden');
+                if (btnTeacher) btnTeacher.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-emerald-500 text-emerald-950 shadow-sm";
+                if (btnGuardian) btnGuardian.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 text-emerald-200 hover:text-white";
+            } else {
+                teacherSec.classList.add('hidden');
+                if (btnGuardian) btnGuardian.className = "px-3.5 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 bg-emerald-500 text-emerald-950 shadow-sm";
+                if (btnTeacher) btnTeacher.className = "px-3.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-1.5 text-emerald-200 hover:text-white";
+            }
+            renderClassCards();
+        }
+
+        function setCardLanguage(lang) {
+            cardLang = lang;
+            ['both', 'bn', 'en'].forEach(l => {
+                const btn = document.getElementById(`card-lang-${l}`);
+                if (l === lang) {
+                    btn.className = "px-2.5 py-1 rounded-lg bg-white text-slate-900 font-bold shadow-xs";
+                } else {
+                    btn.className = "px-2.5 py-1 rounded-lg text-slate-600 font-medium hover:text-slate-900";
+                }
+            });
+            renderClassCards();
+        }
+
+        // =========================================================================
+        // 4. STATS & CHRONOLOGICAL CLASS CARDS RENDERER
+        // =========================================================================
+        function renderStats() {
+            const heldCount = records.filter(r => !r.absent).length;
+            document.getElementById('stat-total-classes').textContent = heldCount;
+        }
+
+        function renderClassCards() {
+            const search = (document.getElementById('filter-search').value || '').toLowerCase().trim();
+            const month = document.getElementById('filter-month').value;
+
+            // Sort newest first by Date, then by index
+            const sorted = [...records].sort((a, b) => {
+                if (a.Date !== b.Date) return b.Date.localeCompare(a.Date);
+                return Number(b.id || 0) - Number(a.id || 0);
+            });
+
+            const filtered = sorted.filter(item => {
+                const matchesMonth = month === 'all' || (item.Date || '').startsWith(month);
+                const haystack = [
+                    item.Date, item['Class No.'], item['Book Name'],
+                    item.Topics, item.Review, item.Note,
+                    item.BnTopics, item.BnReview, item.BnNote
+                ].join(' ').toLowerCase();
+                const matchesSearch = !search || haystack.includes(search);
+                return matchesMonth && matchesSearch;
+            });
+
+            document.getElementById('visible-count-pill').textContent = `${filtered.length} Records`;
+            const container = document.getElementById('class-cards-feed');
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white rounded-2xl p-10 text-center border border-slate-200">
+                        <p class="text-sm font-semibold text-slate-500">No class records match your current filter.</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = filtered.map(item => {
+                const isAbsent = Boolean(item.absent);
+                const showEn = cardLang === 'both' || cardLang === 'en';
+                const showBn = cardLang === 'both' || cardLang === 'bn';
+
+                const bnTopics = item.BnTopics || item.Topics;
+                const bnReview = item.BnReview || item.Review;
+                const bnNote = item.BnNote || item.Note;
+
+                return `
+                <article class="rounded-2xl border ${isAbsent ? 'bg-rose-50/60 border-rose-200' : 'bg-white border-slate-200/90 hover:border-emerald-300'} shadow-xs transition p-5 sm:p-6 print-shadow-none">
+                    <!-- Top Card Meta Header -->
+                    <div class="flex flex-wrap items-center justify-between gap-2 pb-3.5 border-b ${isAbsent ? 'border-rose-200/70' : 'border-slate-100'}">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="px-3 py-1 rounded-xl text-xs font-extrabold ${isAbsent ? 'bg-rose-600 text-white' : 'bg-emerald-700 text-white'}">
+                                ${escapeHtml(item['Class No.'])}
+                            </span>
+                            <span class="text-xs sm:text-sm font-bold text-slate-800 flex items-center gap-1.5">
+                                <i data-lucide="calendar" class="w-3.5 h-3.5 text-emerald-600"></i>
+                                ${escapeHtml(formatDisplayDate(item.Date))}
+                            </span>
+                            <span class="text-xs text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg font-medium flex items-center gap-1">
+                                <i data-lucide="clock" class="w-3 h-3 text-slate-500"></i>
+                                ${escapeHtml(item.Time)}
+                            </span>
+                        </div>
+
+                        <div class="flex flex-wrap items-center gap-2 no-print">
+                            <!-- Book Pill -->
+                            <span class="text-[11px] font-semibold px-2.5 py-1 rounded-lg ${isAbsent ? 'bg-rose-100 text-rose-800' : 'bg-teal-50 text-teal-800 border border-teal-200/70'}">
+                                ${escapeHtml(item['Book Name'])}
+                            </span>
+
+                            <!-- Share WhatsApp Report Button -->
+                            <button type="button" onclick="copyWhatsAppSingle('${escapeHtml(String(item.id))}')" class="text-xs font-bold bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 px-2.5 py-1 rounded-lg transition flex items-center gap-1" title="Copy bilingual report for WhatsApp">
+                                <i data-lucide="share-2" class="w-3 h-3"></i>
+                                <span>Copy Report</span>
+                            </button>
+
+                            <!-- Teacher Edit / Delete Buttons (Only in Unlocked Teacher Mode) -->
+                            ${(!IS_GUARDIAN_LOCKED && currentMode === 'teacher') ? `
+                                <button type="button" onclick="startEditRecord('${escapeHtml(String(item.id))}')" class="text-xs font-semibold bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 px-2.5 py-1 rounded-lg transition">
+                                    Edit
+                                </button>
+                                <button type="button" onclick="confirmDeleteRecord('${escapeHtml(String(item.id))}')" class="text-xs font-semibold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 px-2.5 py-1 rounded-lg transition">
+                                    Delete
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+
+                    <!-- Card Body: Bilingual Columns or Single Language -->
+                    <div class="pt-4 grid grid-cols-1 ${cardLang === 'both' ? 'lg:grid-cols-2' : ''} gap-4">
+                        ${showEn ? `
+                        <div class="space-y-2.5 ${cardLang === 'both' ? 'lg:pr-4 lg:border-r lg:border-slate-100' : ''}">
+                            <div class="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                                <span>English Summary</span>
+                            </div>
+                            <div class="p-3 rounded-xl ${isAbsent ? 'bg-white/80' : 'bg-slate-50/80'} space-y-2">
+                                <div>
+                                    <span class="text-[11px] font-bold text-emerald-700 uppercase">Topics Covered:</span>
+                                    <p class="text-xs sm:text-sm text-slate-800 font-medium leading-relaxed mt-0.5">${escapeHtml(item.Topics)}</p>
+                                </div>
+                                <div class="pt-1.5 border-t border-slate-200/60">
+                                    <span class="text-[11px] font-bold text-amber-700 uppercase">Previous Sabak Review:</span>
+                                    <p class="text-xs text-slate-600 mt-0.5">${escapeHtml(item.Review)}</p>
+                                </div>
+                                <div class="pt-1.5 border-t border-slate-200/60">
+                                    <span class="text-[11px] font-bold text-sky-700 uppercase">Teacher's Note & Homework:</span>
+                                    <p class="text-xs text-slate-600 mt-0.5">${escapeHtml(item.Note)}</p>
+                                </div>
+                            </div>
+                        </div>
+                        ` : ''}
+
+                        ${showBn ? `
+                        <div class="space-y-2.5 bangla">
+                            <div class="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-emerald-700">
+                                <span>বাংলা বিবরণ (অভিভাবকদের জন্য)</span>
+                            </div>
+                            <div class="p-3 rounded-xl ${isAbsent ? 'bg-white/80' : 'bg-emerald-50/40 border border-emerald-100/70'} space-y-2">
+                                <div>
+                                    <span class="text-xs font-bold text-emerald-800">আজকের পড়ানো বিষয়:</span>
+                                    <p class="text-xs sm:text-sm text-slate-800 font-medium leading-relaxed mt-0.5">${escapeHtml(bnTopics)}</p>
+                                </div>
+                                <div class="pt-1.5 border-t border-emerald-100">
+                                    <span class="text-xs font-bold text-amber-800">আগের পড়া / সবক যাচাই:</span>
+                                    <p class="text-xs sm:text-sm text-slate-700 mt-0.5">${escapeHtml(bnReview)}</p>
+                                </div>
+                                <div class="pt-1.5 border-t border-emerald-100">
+                                    <span class="text-xs font-bold text-sky-800">শিক্ষকের মন্তব্য ও বাড়ির কাজ:</span>
+                                    <p class="text-xs sm:text-sm text-slate-700 mt-0.5">${escapeHtml(bnNote)}</p>
+                                </div>
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+                </article>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        }
+
+        // =========================================================================
+        // 5. TEACHER SMART AI & DICTIONARY FORMATTER (ADD / EDIT CLASS)
+        // =========================================================================
+        function fillSampleTeacherNote() {
+            document.getElementById('f-raw-notes').value = "ager diner ojur sunnat 7 ti shunchi, ajke qawmi kayda 29 sabak 4 line poraisi, sura nasr 2 line mukhosto koraisi, ar namajer niyot shikhaisi";
+            showToast("Sample note filled! Click 'Generate & Save Class to Portal'.", "info");
+        }
+
+        document.getElementById('class-entry-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const editId = document.getElementById('edit-record-id').value;
+            const date = document.getElementById('f-date').value;
+            const classNo = document.getElementById('f-class-no').value.trim();
+            const time = document.getElementById('f-time').value.trim();
+            const status = document.getElementById('f-status').value;
+            const rawNotes = document.getElementById('f-raw-notes').value.trim();
+
+            const selectedBooks = Array.from(document.querySelectorAll('input[name="f-books"]:checked')).map(cb => cb.value);
+            const bookName = status === 'absent'
+                ? 'No Class (Absent)'
+                : (selectedBooks.length > 0 ? selectedBooks.join(', ') : 'Qawmi Qaida (Noorani Qaida) & 10 Minute School PDF');
+
+            const btn = document.getElementById('btn-save-class');
+            btn.disabled = true;
+            btn.innerHTML = `<span>Formatting & Saving...</span>`;
+
+            try {
+                let formatted;
+                if (status === 'absent') {
+                    formatted = {
+                        Topics: rawNotes || 'No class held - Student was away',
+                        Review: 'N/A - Class not held',
+                        Note: 'Class was not conducted.',
+                        BnTopics: rawNotes || 'শিক্ষার্থী অনুপস্থিত থাকায় ক্লাস অনুষ্ঠিত হয়নি।',
+                        BnReview: 'ক্লাস অনুষ্ঠিত হয়নি।',
+                        BnNote: 'পরবর্তী ক্লাসে নিয়মিত পড়া চলবে।'
+                    };
+                } else {
+                    formatted = await formatWithGeminiOrFallback(rawNotes, bookName);
+                }
+
+                const newEntry = {
+                    id: editId ? String(editId) : String(Date.now()),
+                    Date: date,
+                    'Class No.': classNo,
+                    Time: time,
+                    'Student Name': 'Nazif Al Kabir',
+                    'Book Name': bookName,
+                    Topics: formatted.Topics,
+                    Review: formatted.Review,
+                    Note: formatted.Note,
+                    BnTopics: formatted.BnTopics,
+                    BnReview: formatted.BnReview,
+                    BnNote: formatted.BnNote,
+                    absent: status === 'absent'
+                };
+
+                await persistSingleRecord(newEntry);
+                showToast(editId ? "Class record updated & synced!" : "New class added & synced live!", "success");
+                resetFormToNew();
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<i data-lucide="wand-2" class="w-4 h-4"></i> <span>Generate & Save Class to Portal</span>`;
+                lucide.createIcons();
+            }
+        });
+
+        async function formatWithGeminiOrFallback(rawNotes, bookName) {
+            const apiKey = ""; // Runtime key if available
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            const prompt = `Convert this teacher's raw Banglish/Bangla note for student Nazif Al Kabir (Books: ${bookName}) into clean, accurate English and polite Bengali.
+Fix Islamic terms: Noorani Qaida, Qawmi Qaida, 10 Minute School PDF, Rahe Najat, Surah Al-Fil, Surah Al-Fatihah, Surah Al-Ikhlas, Surah Al-Falaq, Surah An-Nas, Thana (Sana), Durood Sharif, 3 Alif Madd, 4 Alif Madd, 7 Sunnahs of Wudu, 4 Causes of Breaking Wudu, Sabak.
+Raw note: "${rawNotes}"`;
+
+            try {
+                const res = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }],
+                        generationConfig: {
+                            responseMimeType: "application/json",
+                            responseSchema: {
+                                type: "OBJECT",
+                                properties: {
+                                    Topics: { type: "STRING" },
+                                    Review: { type: "STRING" },
+                                    Note: { type: "STRING" },
+                                    BnTopics: { type: "STRING" },
+                                    BnReview: { type: "STRING" },
+                                    BnNote: { type: "STRING" }
+                                },
+                                required: ["Topics", "Review", "Note", "BnTopics", "BnReview", "BnNote"]
+                            }
+                        }
+                    })
+                });
+                if (!res.ok) throw new Error("API unavailable");
+                const data = await res.json();
+                const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!text) throw new Error("Empty AI output");
+                return JSON.parse(text);
+            } catch (e) {
+                // Offline Smart Dictionary Fallback
+                const cleanEn = applyIslamicDictionary(rawNotes);
+                return {
+                    Topics: cleanEn,
+                    Review: "Completed - Previous sabak and memorization heard & reviewed.",
+                    Note: "Please revise today's lesson and practice recitation at home.",
+                    BnTopics: cleanEn,
+                    BnReview: "আগের দিনের সবক ও মুখস্থ পড়া শোনা হয়েছে।",
+                    BnNote: "আজকের পড়ানো বিষয়গুলো বাসায় ভালোভাবে রিভিশন দেওয়ার অনুরোধ রইল।"
+                };
+            }
+        }
+
+        function applyIslamicDictionary(text) {
+            return text
+                .replace(/nurani\s*kayda/gi, 'Noorani Qaida')
+                .replace(/qawmi\s*kayda/gi, 'Qawmi Qaida')
+                .replace(/10\s*minit\s*school(\s*pdf)?/gi, '10 Minute School PDF')
+                .replace(/rahe\s*najat/gi, 'Rahe Najat')
+                .replace(/surafil|sura\s*fil/gi, 'Surah Al-Fil')
+                .replace(/sura\s*fateha/gi, 'Surah Al-Fatihah')
+                .replace(/sura\s*ikhlas/gi, 'Surah Al-Ikhlas')
+                .replace(/sura\s*falak/gi, 'Surah Al-Falaq')
+                .replace(/sura\s*nas/gi, 'Surah An-Nas')
+                .replace(/durud\s*sharif/gi, 'Durood Sharif')
+                .replace(/\bsana\b/gi, 'Thana (Sana)')
+                .replace(/3\s*alif\s*madd/gi, '3 Alif Madd')
+                .replace(/4\s*alif\s*madd/gi, '4 Alif Madd')
+                .replace(/ojur\s*sunnat\s*7\s*ti/gi, '7 Sunnahs of Wudu')
+                .replace(/oju\s*vonger\s*karon\s*4\s*ti/gi, '4 Causes of Breaking Wudu')
+                .replace(/\bsbak\b/gi, 'Sabak');
+        }
+
+        function startEditRecord(id) {
+            const item = records.find(r => String(r.id) === String(id));
+            if (!item) return;
+            document.getElementById('edit-record-id').value = String(item.id);
+            document.getElementById('f-date').value = item.Date;
+            document.getElementById('f-class-no').value = item['Class No.'];
+            document.getElementById('f-time').value = item.Time;
+            document.getElementById('f-status').value = item.absent ? 'absent' : 'present';
+            document.getElementById('f-raw-notes').value = item.Topics;
+            document.getElementById('form-heading').textContent = `Editing ${item['Class No.']} (${item.Date})`;
+            document.getElementById('cancel-edit-btn').classList.remove('hidden');
+            document.getElementById('teacher-workspace').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetFormToNew() {
+            document.getElementById('edit-record-id').value = '';
+            document.getElementById('f-raw-notes').value = '';
+            document.getElementById('f-status').value = 'present';
+            document.getElementById('form-heading').textContent = 'Add New Class & AI Note Formatter';
+            document.getElementById('cancel-edit-btn').classList.add('hidden');
+            initFormDefaults();
+        }
+
+        // =========================================================================
+        // 6. SHARING, BACKUP, RESTORE & MODAL HELPERS
+        // =========================================================================
+        function copyWhatsAppSingle(id) {
+            const item = records.find(r => String(r.id) === String(id));
+            if (!item) return;
+
+            const bnTopics = item.BnTopics || item.Topics;
+            const bnReview = item.BnReview || item.Review;
+            const bnNote = item.BnNote || item.Note;
+
+            const msg = `আসসালামু আলাইকুম,\n📚 *Al-Hidayah Online Quran & Arabic Studies*\n👤 *Student:* ${item['Student Name']}\n📅 *Date:* ${item.Date} (${item['Class No.']})\n⏰ *Time:* ${item.Time}\n📖 *Books:* ${item['Book Name']}\n\n✅ *Previous Lesson Review (আগের পড়া):*\n${bnReview}\n\n📘 *Today's Topics (আজকের নতুন পড়া):*\n${bnTopics}\n\n🏠 *Homework & Note (বাড়ির কাজ):*\n${bnNote}\n\nজাযাকাল্লাহু খাইরান।`;
+
+            copyToClipboard(msg, `Copied ${item['Class No.']} report for WhatsApp!`);
+        }
+
+        function copyToClipboard(text, successMessage) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.left = '-9999px';
+            document.body.appendChild(ta);
+            ta.select();
+            try {
+                document.execCommand('copy');
+                showToast(successMessage, 'success');
+            } catch (e) {
+                showToast('Copy failed.', 'error');
+            }
+            document.body.removeChild(ta);
+        }
+
+        function exportBackupJSON() {
+            const blob = new Blob([JSON.stringify(records, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Nazif_Al_Kabir_Progress_Backup_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast("Backup file downloaded!", "success");
+        }
+
+        function importBackupJSON(event) {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (Array.isArray(imported) && imported.length > 0) {
+                        for (let idx = 0; idx < imported.length; idx++) {
+                            const rec = imported[idx];
+                            await persistSingleRecord({ id: String(rec.id || (2000 + idx)), ...rec });
+                        }
+                        showToast(`Restored & synced ${imported.length} class records!`, "success");
+                    } else {
+                        showToast("Invalid backup file format.", "error");
+                    }
+                } catch (err) {
+                    showToast("Could not read backup file.", "error");
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        function exportCSV() {
+            const headers = ["Date", "Class No.", "Time", "Student Name", "Book Name", "Topics", "Review", "Note"];
+            const esc = (v) => `"${String(v || '').replace(/"/g, '""')}"`;
+            const csvRows = [headers.join(','), ...records.map(r => [
+                esc(r.Date), esc(r['Class No.']), esc(r.Time), esc(r['Student Name']),
+                esc(r['Book Name']), esc(r.Topics), esc(r.Review), esc(r.Note)
+            ].join(','))];
+
+            const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Nazif_Al_Kabir_Classes_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast("CSV exported!", "success");
+        }
+
+        // Custom Modal Handlers
+        let pendingModalAction = null;
+        function openConfirmModal(title, message, onConfirm) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-message').textContent = message;
+            pendingModalAction = onConfirm;
+            document.getElementById('confirm-modal').classList.remove('hidden');
+        }
+        function closeConfirmModal() {
+            document.getElementById('confirm-modal').classList.add('hidden');
+            pendingModalAction = null;
+        }
+        document.getElementById('modal-confirm-btn').addEventListener('click', () => {
+            if (pendingModalAction) pendingModalAction();
+            closeConfirmModal();
+        });
+
+        function confirmDeleteRecord(id) {
+            openConfirmModal("Delete Class Record", "Are you sure you want to remove this class entry from the portal?", async () => {
+                await removeSingleRecord(id);
+                showToast("Record deleted & synced.", "info");
+            });
+        }
+
+        function confirmResetDefault() {
+            openConfirmModal("Reset to Default 24 Records", "This will restore the original 24 class records (Class 01 to Class 23). Continue?", async () => {
+                records = DEFAULT_RECORDS.map((r, idx) => ({ id: String(1000 + idx), ...r }));
+                renderStats();
+                renderClassCards();
+                if (isCloudReady && db && currentUser) {
+                    await seedDefaultRecordsToCloud();
+                }
+                showToast("Restored & synced all 24 default class records!", "success");
+            });
+        }
+
+        // Expose functions to inline HTML event handlers
+        window.switchMode = switchMode;
+        window.setCardLanguage = setCardLanguage;
+        window.renderClassCards = renderClassCards;
+        window.copyGuardianLink = copyGuardianLink;
+        window.fillSampleTeacherNote = fillSampleTeacherNote;
+        window.startEditRecord = startEditRecord;
+        window.resetFormToNew = resetFormToNew;
+        window.copyWhatsAppSingle = copyWhatsAppSingle;
+        window.exportBackupJSON = exportBackupJSON;
+        window.importBackupJSON = importBackupJSON;
+        window.exportCSV = exportCSV;
+        window.closeConfirmModal = closeConfirmModal;
+        window.confirmDeleteRecord = confirmDeleteRecord;
+        window.confirmResetDefault = confirmResetDefault;
+            const container = document.getElementById('toast-container');
+            const el = document.createElement('div');
+            const styleMap = {
+                success: 'bg-emerald-900 text-white border-emerald-700',
+                info: 'bg-slate-800 text-white border-slate-700',
+                error: 'bg-rose-700 text-white border-rose-600'
+            };
+            el.className = `pointer-events-auto px-4 py-3 rounded-xl shadow-lg border text-xs sm:text-sm font-semibold transition-all transform translate-y-2 opacity-0 ${styleMap[type] || styleMap.info}`;
+            el.textContent = msg;
+            container.appendChild(el);
+            requestAnimationFrame(() => el.classList.remove('translate-y-2', 'opacity-0'));
+            setTimeout(() => {
